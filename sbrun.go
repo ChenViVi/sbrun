@@ -27,10 +27,10 @@ func main() {
 			fmt.Println("你丫配置文件到底搁哪儿呢")
 		} else {
 			//netstat -lnp|grep 111111
-			ExeCommand("netstat", "-lnp", "|" ,"grep" ,GetPort(applicationPropertiesBytes))
+			ExeCommand("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes))
 		}
     } else {
-			ExeCommand("netstat", "-lnp", "|" ,"grep" ,GetPort(applicationPropertiesBytes))
+			ExeCommand("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes))
     }
 }
 
