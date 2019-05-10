@@ -29,7 +29,7 @@ func main() {
 		if err2 != nil {
 			fmt.Println("你丫配置文件到底搁哪儿呢")
 		} else {
-			fmt.Println(GetPid(GetPort(applicationPropertiesBytes)))
+			fmt.Println(GetPid(applicationPropertiesBytes))
 			//netstat -lnp|grep 111111
 			//out, _ := exec.Command("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes)).Output()
 			//fmt.Println(out)
@@ -37,28 +37,33 @@ func main() {
 			
 		}
     } else {
-			fmt.Println(GetPid(GetPort(applicationPropertiesBytes)))
+			fmt.Println(GetPid(applicationPropertiesBytes))
 			//out, _ := exec.Command("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes)).Output()
 			//fmt.Println(out)
 			//ExeCommand("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes))
     }
 }
 
-func GetPid(port string) string{
-	var b bytes.Buffer
-	if err := pipe.Command(&b,
+func GetPid(applicationPropertiesBytes []byte) string{
+	var pidBytes bytes.Buffer
+	if err := pipe.Command(&pidBytes,
 		exec.Command("netstat", "-lnp"),
-		exec.Command("grep", port),
+		exec.Command("grep", GetPort(applicationPropertiesBytes)),
 	); err != nil {
 		fmt.Println(err)
 		return "";
 	}
 
-	if _, err := io.Copy(os.Stdout, &b); err != nil {
+	if _, err := io.Copy(os.Stdout, &pidBytes); err != nil {
 		fmt.Println(err)
 		return "";
 	}
-	return b.String()
+	pidStr := pidBytes.String()
+	pidStrRe, _ := regexp.Compile("([1-9]\\d*)/java")
+	pidStr = pidStrRe.FindString(pidStr)
+	pidRe, _ := regexp.Compile("[1-9]\\d*")
+	pid := pidRe.FindString(pidStr)
+	return pid
 }
 
 func GetPort(applicationPropertiesBytes []byte) string{
