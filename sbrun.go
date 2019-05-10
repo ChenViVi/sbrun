@@ -35,20 +35,17 @@ func main() {
 			//fmt.Println(out)
 			//ExeCommand("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes))
 			pid := GetPid(applicationPropertiesBytes)
-			KillProcess(pid)
+			ExeCommand("kill", "-s", "9", pid)
+			ExeCommand("nohup", "mvn", "spring-boot:run", "&")
 		}
     } else {
 			pid := GetPid(applicationPropertiesBytes)
-			KillProcess(pid)
+			ExeCommand("kill", "-s", "9", pid)
+			ExeCommand("nohup", "mvn", "spring-boot:run", "&")
 			//out, _ := exec.Command("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes)).Output()
 			//fmt.Println(out)
 			//ExeCommand("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes))
     }
-}
-
-//kill -s 9 111111
-func KillProcess(pid string){
-	ExeCommand("kill", "-s", "9", pid)
 }
 
 //netstat -lnp|grep 111111
