@@ -2,11 +2,14 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"regexp"
+	pipe "github.com/b4b4r07/go-pipe"
 )
 
 func main() {
@@ -26,16 +29,36 @@ func main() {
 		if err2 != nil {
 			fmt.Println("你丫配置文件到底搁哪儿呢")
 		} else {
+			fmt.Println(GetPid(GetPort(applicationPropertiesBytes)))
 			//netstat -lnp|grep 111111
-			out, _ := exec.Command("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes)).Output()
-			fmt.Println(out)
+			//out, _ := exec.Command("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes)).Output()
+			//fmt.Println(out)
 			//ExeCommand("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes))
+			
 		}
     } else {
-			out, _ := exec.Command("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes)).Output()
-			fmt.Println(out)
+			fmt.Println(GetPid(GetPort(applicationPropertiesBytes)))
+			//out, _ := exec.Command("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes)).Output()
+			//fmt.Println(out)
 			//ExeCommand("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes))
     }
+}
+
+func GetPid(port string) string{
+	var b bytes.Buffer
+	if err := pipe.Command(&b,
+		exec.Command("netstat", "-lnp"),
+		exec.Command("grep", port),
+	); err != nil {
+		fmt.Println(err)
+		return "";
+	}
+
+	if _, err := io.Copy(os.Stdout, &b); err != nil {
+		fmt.Println(err)
+		return "";
+	}
+	return b.String()
 }
 
 func GetPort(applicationPropertiesBytes []byte) string{
