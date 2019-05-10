@@ -54,16 +54,16 @@ func GetPid(applicationPropertiesBytes []byte) string{
 		return "";
 	}
 
-	if _, err := io.Copy(os.Stdout, &pidBytes); err != nil {
-		fmt.Println(err)
-		return "";
-	}
+	// if _, err := io.Copy(os.Stdout, &pidBytes); err != nil {
+	// 	fmt.Println(err)
+	// 	return "";
+	// }
 	pidStr := pidBytes.String()
 	pidStrRe, _ := regexp.Compile("([1-9]\\d*)/java")
 	pidStr = pidStrRe.FindString(pidStr)
-	//pidRe, _ := regexp.Compile("[1-9]\\d*")
-	//pid := pidRe.FindString(pidStr)
-	return pidStr
+	pidRe, _ := regexp.Compile("[1-9]\\d*")
+	pid := pidRe.FindString(pidStr)
+	return pid
 }
 
 func GetPort(applicationPropertiesBytes []byte) string{
