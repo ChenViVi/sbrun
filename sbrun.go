@@ -1,59 +1,55 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"os"
 	"os/exec"
 	"regexp"
 	pipe "github.com/b4b4r07/go-pipe"
 )
 
 func main() {
-	// applicationPropertiesBytes, err1 := ioutil.ReadFile("src/main/resources/application.properties")
-	// if err1 != nil {
-	// 	applicationPropertiesBytes, err2 := ioutil.ReadFile("src/main/resources/application.yaml")
-	// 	if err2 != nil {
-	// 		fmt.Println("你丫配置文件到底搁哪儿呢")
-	// 	}
-	// 	// else {
-	// 	// 	GetPort(applicationPropertiesBytes)
-	// 	// }
-	// }
+	pid := ""
+	if pid == ""{
+		fmt.Println("0")
+	} else {
+		fmt.Println("1")
+	}
 	applicationPropertiesBytes, err1 := ioutil.ReadFile("src/main/resources/application.properties")
     if err1 != nil {
 		applicationPropertiesBytes, err2 := ioutil.ReadFile("src/main/resources/application.yaml")
 		if err2 != nil {
 			fmt.Println("你丫配置文件到底搁哪儿呢")
 		} else {
-			fmt.Println(GetPid(applicationPropertiesBytes))
-			//netstat -lnp|grep 111111
-			//out, _ := exec.Command("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes)).Output()
-			//fmt.Println(out)
-			//ExeCommand("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes))
-			pid := GetPid(applicationPropertiesBytes)
-			ExeCommand("kill", "-s", "9", pid)
-			ExeCommand("nohup", "mvn", "spring-boot:run", "&")
+			run(applicationPropertiesBytes)
 		}
     } else {
-			pid := GetPid(applicationPropertiesBytes)
-			ExeCommand("kill", "-s", "9", pid)
-			ExeCommand("nohup", "mvn", "spring-boot:run", "&")
-			//out, _ := exec.Command("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes)).Output()
-			//fmt.Println(out)
-			//ExeCommand("netstat", "-lnp", "|grep " + GetPort(applicationPropertiesBytes))
+			run(applicationPropertiesBytes)
     }
 }
 
-//netstat -lnp|grep 111111
-func GetPid(applicationPropertiesBytes []byte) string{
+func run(applicationPropertiesBytes []byte){
+	port := GetPort(applicationPropertiesBytes)
+	pid := GetPid(port)
+	if pid != ""{
+		ExeCommand(false, "kill", "-s", "9", pid)
+	}
+	ExeCommand(true, "nohup", "mvn", "spring-boot:run")
+	runPid := GetPid(port)
+	if runPid == "" {
+		fmt.Println("运行失败")
+	} else {
+		fmt.Println("运行成功")
+	}
+}
+
+//netstat -lnp|grep port
+func GetPid(port string) string{
 	var pidBytes bytes.Buffer
 	if err := pipe.Command(&pidBytes,
 		exec.Command("netstat", "-lnp"),
-		exec.Command("grep", GetPort(applicationPropertiesBytes)),
+		exec.Command("grep", port),
 	); err != nil {
 		fmt.Println(err)
 		return "";
@@ -75,34 +71,11 @@ func GetPort(applicationPropertiesBytes []byte) string{
 	return port
 }
 
-func ExeCommand(commandName string, arg ...string) bool {
-	//函数返回一个*Cmd，用于使用给出的参数执行name指定的程序
+func ExeCommand(wait bool, commandName string, arg ...string) {
 	cmd := exec.Command(commandName, arg...)
-
-	//显示运行的命令
 	fmt.Println(cmd.Args)
-	//StdoutPipe方法返回一个在命令Start后与命令标准输出关联的管道。Wait方法获知命令结束后会关闭这个管道，一般不需要显式的关闭该管道。
-	stdout, err := cmd.StdoutPipe()
-
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
-
 	cmd.Start()
-	//创建一个流来读取管道内内容，这里逻辑是通过一行一行的读取的
-	reader := bufio.NewReader(stdout)
-
-	//实时循环读取输出流中的一行内容
-	for {
-		line, err2 := reader.ReadString('\n')
-		if err2 != nil || io.EOF == err2 {
-			break
-		}
-		fmt.Println(line)
+	if wait {
+		cmd.Wait()
 	}
-
-	//阻塞直到该命令执行完成，该命令必须是被Start方法开始执行的
-	cmd.Wait()
-	return true
 }
