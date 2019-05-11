@@ -4,19 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"os"
+//	"os"
 	"os/exec"
 	"regexp"
 	pipe "github.com/b4b4r07/go-pipe"
 )
 
 func main() {
-	pid := ""
-	if pid == ""{
-		fmt.Println("0")
-	} else {
-		fmt.Println("1")
-	}
 	applicationPropertiesBytes, err1 := ioutil.ReadFile("src/main/resources/application.properties")
     if err1 != nil {
 		applicationPropertiesBytes, err2 := ioutil.ReadFile("src/main/resources/application.yaml")
@@ -34,17 +28,10 @@ func run(applicationPropertiesBytes []byte){
 	port := GetPort(applicationPropertiesBytes)
 	pid := GetPid(port)
 	if pid != ""{
-		ExeCommand(false, "kill", "-s", "9", pid)
+		exec.Command("kill", "-s", "9", pid).Start()
 	}
-	ExeCommand(true, "nohup", "mvn", "spring-boot:run")
-	os.Exit(1)
-	// fmt.Println("fuck")
-	// runPid := GetPid(port)
-	// if runPid == "" {
-	// 	fmt.Println("运行失败")
-	// } else {
-	// 	fmt.Println("运行成功")
-	// }
+	exec.Command( "nohup", "mvn", "spring-boot:run").Start()
+	//os.Exit(1)
 }
 
 //netstat -lnp|grep port
