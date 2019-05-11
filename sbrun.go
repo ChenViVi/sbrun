@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"regexp"
 	pipe "github.com/b4b4r07/go-pipe"
@@ -36,13 +37,14 @@ func run(applicationPropertiesBytes []byte){
 		ExeCommand(false, "kill", "-s", "9", pid)
 	}
 	ExeCommand(true, "nohup", "mvn", "spring-boot:run")
-	fmt.Println("fuck")
-	runPid := GetPid(port)
-	if runPid == "" {
-		fmt.Println("运行失败")
-	} else {
-		fmt.Println("运行成功")
-	}
+	os.Exit(1)
+	// fmt.Println("fuck")
+	// runPid := GetPid(port)
+	// if runPid == "" {
+	// 	fmt.Println("运行失败")
+	// } else {
+	// 	fmt.Println("运行成功")
+	// }
 }
 
 //netstat -lnp|grep port
