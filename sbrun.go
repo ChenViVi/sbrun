@@ -36,12 +36,13 @@ func run(applicationPropertiesBytes []byte){
 		ExeCommand(false, "kill", "-s", "9", pid)
 	}
 	ExeCommand(true, "nohup", "mvn", "spring-boot:run")
-	runPid := GetPid(port)
-	if runPid == "" {
-		fmt.Println("运行失败")
-	} else {
-		fmt.Println("运行成功")
-	}
+	fmt.Println("fuck")
+	// runPid := GetPid(port)
+	// if runPid == "" {
+	// 	fmt.Println("运行失败")
+	// } else {
+	// 	fmt.Println("运行成功")
+	// }
 }
 
 //netstat -lnp|grep port
