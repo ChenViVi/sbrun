@@ -45,10 +45,34 @@ func GetPid(port string) string{
 	// 	fmt.Println(err)
 	// 	return "";
 	// }
-	c1 := exec.Command("ls")
-	c2 := exec.Command("wc", "-l")
 
-	r, w := io.Pipe() 
+
+
+	// c1 := exec.Command("ls")
+	// c2 := exec.Command("wc", "-l")
+
+	// r, w := io.Pipe() 
+	// c1.Stdout = w
+	// c2.Stdin = r
+
+	// var pidBytes bytes.Buffer
+	// c2.Stdout = &pidBytes
+
+	// c1.Start()
+	// c2.Start()
+	// c1.Wait()
+	// w.Close()
+	// c2.Wait()
+	// pidStr := pidBytes.String()
+	// pidStrRe, _ := regexp.Compile("([1-9]\\d*)/java")
+	// pidStr = pidStrRe.FindString(pidStr)
+	// pidRe, _ := regexp.Compile("[1-9]\\d*")
+	// pid := pidRe.FindString(pidStr)
+
+	c1 := exec.Command("netstat", "-lnp")
+	c2 := exec.Command("grep", port)
+
+	r, w := io.Pipe()
 	c1.Stdout = w
 	c2.Stdin = r
 
